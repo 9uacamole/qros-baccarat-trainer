@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>QROS Baccarat Trainer v14 — Themed Last Hand Dialog</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>QROS Baccarat Trainer v15 — Mobile Responsive</title>
 <style>
 :root{--bg:#07111a;--panel:#0d1b27;--panel2:#102331;--line:#294558;--text:#edf6ff;--muted:#86a3b7;--banker:#ef3340;--player:#2f7df6;--tie:#22c55e;--gold:#f5b942;--good:#35d07f;--bad:#ff5c66;--cyan:#37c5ff;--orange:#f28c28}
 *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% -20%,#163042 0,#07111a 45%);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
@@ -21,6 +21,109 @@ button,input,select{font:inherit}.app{max-width:1560px;margin:auto;padding:14px}
 .predictionGrid{display:grid;gap:7px}.predRow{background:#091620;border:1px solid #21394a;border-radius:8px;padding:8px}.predHead{display:flex;justify-content:space-between;gap:8px;align-items:center}.predHead b{font-size:12px}.roadColor{font-size:10px;font-weight:900;padding:2px 6px;border-radius:8px}.roadColor.red{background:#4b1717;color:#ff8e8e}.roadColor.blue{background:#122e59;color:#78b1ff}.predMeta{font-size:10px;color:var(--muted);line-height:1.45;margin-top:4px}.direction{font-weight:900;color:var(--cyan)}.confluence{margin-top:8px;padding:8px;border-radius:8px;background:#102b2a;border:1px solid #24604f;font-size:11px}.hiddenPred{filter:blur(5px);user-select:none;opacity:.65}.miniBadge{display:inline-block;padding:2px 6px;border-radius:7px;background:#173549;font-size:9px;margin-left:4px}.target i{display:block;height:100%;background:var(--good);width:0%}@media(max-width:1000px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}.roadPairs{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.side .card:first-child{grid-column:1/-1}}@media(max-width:650px){.stats{grid-template-columns:repeat(2,1fr)}.side{display:flex}.dealTable{grid-template-columns:1fr}.road.big{grid-template-rows:repeat(6,30px);grid-auto-columns:30px;background-size:30px 30px}}
 
 .lastHandDialog{width:min(430px,calc(100vw - 28px));border:1px solid #315163;border-radius:14px;padding:0;background:linear-gradient(180deg,#102331,#0d1b27);color:var(--text);box-shadow:0 24px 80px #000c}.lastHandDialog::backdrop{background:#02070bb8;backdrop-filter:blur(3px)}.lastHandDialogInner{padding:18px}.lastHandDialogTitle{font-size:18px;font-weight:900;color:#ffb84d;letter-spacing:.03em}.lastHandDialogResult{margin-top:10px;padding:10px 12px;border:1px solid #294558;border-radius:9px;background:#091620;font-size:13px;line-height:1.55}.lastHandDialogNote{margin-top:10px;color:#cfe1ec;font-size:12px;line-height:1.5}.lastHandDialogBtn{width:100%;margin-top:14px;border:0;border-radius:9px;padding:11px 14px;background:linear-gradient(90deg,#d77400,#ff9a14);color:#fff;font-weight:900;cursor:pointer}.lastHandDialogBtn:focus-visible{outline:3px solid #f5b942;outline-offset:2px}
+
+/* v15 — Android/iPhone portrait + landscape responsiveness */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:hidden}
+body{overflow-x:hidden;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+button,select,input{touch-action:manipulation}
+@media (hover:none) and (pointer:coarse){
+  button,.chip,.bet{min-height:44px}
+  .gridWrap{-webkit-overflow-scrolling:touch;scroll-behavior:auto}
+}
+@media (max-width:700px){
+  body{padding-bottom:166px}
+  .app{padding:6px;max-width:none}
+  .top{padding:9px 10px;gap:8px;align-items:stretch;flex-direction:column}
+  .brand{font-size:18px;line-height:1.05}
+  .brand small{font-size:9px;line-height:1.25}
+  .mode{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%}
+  .mode select,.mode button{width:100%;min-width:0;padding:8px 6px;font-size:11px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;padding:6px}
+  .stat{padding:7px 8px;min-width:0}
+  .stat span{font-size:8px}
+  .stat strong{font-size:14px}
+  .layout{display:block;margin-top:7px}
+  .board{padding:6px;border-radius:9px}
+  .dealTable{grid-template-columns:1fr;gap:6px}
+  .handBox{min-height:0;padding:8px}
+  .playingCard{width:42px;height:58px}
+  .roadTitle{margin-top:5px}
+  .roadTitle b{font-size:11px}
+  .roadTitle span{font-size:8px}
+  .roadPairs{grid-template-columns:1fr;gap:6px}
+  .side{display:flex;gap:7px;margin-top:7px}
+  .card{padding:9px;border-radius:9px}
+  .card h3{font-size:12px}
+  .nextMapGrid{grid-template-columns:60px repeat(3,minmax(48px,1fr))}
+  .nextMapCell{min-height:31px;font-size:8px;padding:3px}
+  .chips{gap:5px}
+  .chip{width:46px;height:46px;border-width:4px;font-size:11px}
+  #practiceBetCard,
+  #practiceBetCard.floatingBet{
+    position:fixed!important;
+    left:max(6px,env(safe-area-inset-left))!important;
+    right:max(6px,env(safe-area-inset-right))!important;
+    bottom:max(6px,env(safe-area-inset-bottom))!important;
+    top:auto!important;
+    width:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+    z-index:10000!important;
+    padding:7px!important;
+    border-radius:10px!important;
+    box-shadow:0 10px 34px #000d!important
+  }
+  #practiceBetCard .dragHandle{margin:0 0 5px;cursor:default}
+  #practiceBetCard .dragHint{display:none}
+  #practiceBetCard .betAreas{gap:5px}
+  #practiceBetCard .bet{padding:6px 3px;min-height:54px;font-size:12px}
+  #practiceBetCard .bet small{font-size:8px}
+  #practiceBetCard .actions{gap:5px;margin-top:5px!important}
+  #practiceBetCard .actions button{padding:7px 4px;min-height:36px;font-size:11px}
+  #practiceBetCard .actions .deal{min-height:40px}
+  dialog.lastHandDialog{width:calc(100vw - 24px)!important;max-width:420px}
+}
+@media (max-width:700px) and (orientation:portrait){
+  .road.big{grid-template-rows:repeat(6,28px);grid-auto-columns:28px;background-size:28px 28px}
+  .big .mark{width:22px;height:22px;border-width:3px;font-size:8px}
+  .road{grid-template-rows:repeat(6,27px);grid-auto-columns:27px;background-size:27px 27px}
+  .road.bigEyeRoad,.road.bead{grid-template-rows:repeat(6,27px);grid-auto-columns:27px;background-size:27px 27px}
+  .mark{width:17px;height:17px;border-width:2px}
+  .bead .mark{width:20px;height:20px}
+}
+@media (max-height:560px) and (orientation:landscape){
+  body{padding-bottom:0}
+  .app{padding:5px}
+  .top{padding:6px 9px}
+  .brand{font-size:16px}
+  .brand small{font-size:8px}
+  .stats{grid-template-columns:repeat(7,minmax(90px,1fr));padding:5px;gap:4px;overflow-x:auto}
+  .stat{padding:5px 7px}
+  .stat strong{font-size:13px}
+  .layout{grid-template-columns:minmax(0,1fr) 270px;gap:7px;margin-top:7px}
+  .board{padding:6px}
+  .side{display:flex;gap:6px}
+  .card{padding:8px}
+  #practiceBetCard,
+  #practiceBetCard.floatingBet{
+    position:fixed!important;
+    right:max(6px,env(safe-area-inset-right))!important;
+    left:auto!important;
+    bottom:max(6px,env(safe-area-inset-bottom))!important;
+    top:auto!important;
+    width:min(310px,42vw)!important;
+    max-height:calc(100dvh - 12px)!important;
+    overflow:auto!important;
+    padding:7px!important;
+    z-index:10000!important
+  }
+  #practiceBetCard .dragHandle{margin:0 0 4px}
+  #practiceBetCard .dragHint{display:none}
+  #practiceBetCard .bet{padding:5px 2px;min-height:46px;font-size:11px}
+  #practiceBetCard .bet small{font-size:7px}
+  #practiceBetCard .actions button{padding:6px 3px;min-height:32px;font-size:10px}
+}
+
 </style>
 </head>
 <body>
@@ -168,10 +271,11 @@ function reset(){let start=Math.max(100,+$('startMoney').value||10000),unit=Math
 function buildChips(){let vals=[10,25,50,100,500,1000,S.unit].filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b);$('chips').innerHTML='';vals.forEach(v=>{let b=document.createElement('button');b.className='chip'+(v===S.selectedChip?' sel':'');b.dataset.v=v;b.textContent=v>=1000?(v/1000)+'K':v;b.onclick=()=>selectChip(v);$('chips').appendChild(b)})}
 function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
 function resetPracticeBetPosition(){let card=$('practiceBetCard');card.classList.remove('floatingBet','dragging');card.style.left='';card.style.top='';card.style.width='';try{localStorage.removeItem('qros-practice-bet-position-v8')}catch{}}
-function restorePracticeBetPosition(){let card=$('practiceBetCard');try{let raw=localStorage.getItem('qros-practice-bet-position-v8');if(!raw)return;let pos=JSON.parse(raw);if(!Number.isFinite(pos.left)||!Number.isFinite(pos.top))return;card.classList.add('floatingBet');let w=Math.min(pos.width||card.getBoundingClientRect().width,window.innerWidth-24);card.style.width=w+'px';card.style.left=clamp(pos.left,12,Math.max(12,window.innerWidth-w-12))+'px';card.style.top=clamp(pos.top,12,Math.max(12,window.innerHeight-80))+'px'}catch{}}
-function initPracticeBetDrag(){let card=$('practiceBetCard'),handle=$('practiceBetHandle');if(!card||!handle)return;let drag=null;handle.addEventListener('pointerdown',e=>{if(e.button!==undefined&&e.button!==0)return;let r=card.getBoundingClientRect();if(!card.classList.contains('floatingBet')){card.classList.add('floatingBet');card.style.width=Math.min(r.width,window.innerWidth-24)+'px';card.style.left=r.left+'px';card.style.top=r.top+'px'}r=card.getBoundingClientRect();drag={dx:e.clientX-r.left,dy:e.clientY-r.top,id:e.pointerId};card.classList.add('dragging');handle.setPointerCapture?.(e.pointerId);e.preventDefault()});handle.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;let r=card.getBoundingClientRect(),left=clamp(e.clientX-drag.dx,8,Math.max(8,window.innerWidth-r.width-8)),top=clamp(e.clientY-drag.dy,8,Math.max(8,window.innerHeight-r.height-8));card.style.left=left+'px';card.style.top=top+'px'});let end=e=>{if(!drag||drag.id!==e.pointerId)return;drag=null;card.classList.remove('dragging');let r=card.getBoundingClientRect();try{localStorage.setItem('qros-practice-bet-position-v8',JSON.stringify({left:r.left,top:r.top,width:r.width}))}catch{}};handle.addEventListener('pointerup',end);handle.addEventListener('pointercancel',end);handle.addEventListener('dblclick',()=>resetPracticeBetPosition());window.addEventListener('resize',()=>{if(!card.classList.contains('floatingBet'))return;let r=card.getBoundingClientRect();card.style.left=clamp(r.left,8,Math.max(8,window.innerWidth-r.width-8))+'px';card.style.top=clamp(r.top,8,Math.max(8,window.innerHeight-r.height-8))+'px'})}
+function isPhoneLayout(){return window.matchMedia('(max-width:700px)').matches}
+function restorePracticeBetPosition(){let card=$('practiceBetCard');if(isPhoneLayout()){card.classList.remove('floatingBet','dragging');card.style.left='';card.style.right='';card.style.top='';card.style.bottom='';card.style.width='';return}try{let raw=localStorage.getItem('qros-practice-bet-position-v8');if(!raw)return;let pos=JSON.parse(raw);if(!Number.isFinite(pos.left)||!Number.isFinite(pos.top))return;card.classList.add('floatingBet');let w=Math.min(pos.width||card.getBoundingClientRect().width,window.innerWidth-24);card.style.width=w+'px';card.style.left=clamp(pos.left,12,Math.max(12,window.innerWidth-w-12))+'px';card.style.top=clamp(pos.top,12,Math.max(12,window.innerHeight-80))+'px'}catch{}}
+function initPracticeBetDrag(){let card=$('practiceBetCard'),handle=$('practiceBetHandle');if(!card||!handle)return;let drag=null;handle.addEventListener('pointerdown',e=>{if(isPhoneLayout())return;if(e.button!==undefined&&e.button!==0)return;let r=card.getBoundingClientRect();if(!card.classList.contains('floatingBet')){card.classList.add('floatingBet');card.style.width=Math.min(r.width,window.innerWidth-24)+'px';card.style.left=r.left+'px';card.style.top=r.top+'px'}r=card.getBoundingClientRect();drag={dx:e.clientX-r.left,dy:e.clientY-r.top,id:e.pointerId};card.classList.add('dragging');handle.setPointerCapture?.(e.pointerId);e.preventDefault()});handle.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;let r=card.getBoundingClientRect(),left=clamp(e.clientX-drag.dx,8,Math.max(8,window.innerWidth-r.width-8)),top=clamp(e.clientY-drag.dy,8,Math.max(8,window.innerHeight-r.height-8));card.style.left=left+'px';card.style.top=top+'px'});let end=e=>{if(!drag||drag.id!==e.pointerId)return;drag=null;card.classList.remove('dragging');let r=card.getBoundingClientRect();try{localStorage.setItem('qros-practice-bet-position-v8',JSON.stringify({left:r.left,top:r.top,width:r.width}))}catch{}};handle.addEventListener('pointerup',end);handle.addEventListener('pointercancel',end);handle.addEventListener('dblclick',()=>resetPracticeBetPosition());window.addEventListener('resize',()=>{if(!card.classList.contains('floatingBet'))return;let r=card.getBoundingClientRect();card.style.left=clamp(r.left,8,Math.max(8,window.innerWidth-r.width-8))+'px';card.style.top=clamp(r.top,8,Math.max(8,window.innerHeight-r.height-8))+'px'})}
 function save(){try{localStorage.setItem('qros-baccarat-trainer-v8-noncommission',JSON.stringify({...S,shoe:S.shoe.slice(0,416)}))}catch{}}
-function init(){window.addEventListener('resize',()=>{renderAll()});startShoe(true);buildChips();restorePracticeBetPosition();initPracticeBetDrag();document.querySelectorAll('.bet').forEach(b=>b.onclick=()=>addBet(b.dataset.side));$('clearBet').onclick=clearBet;$('skip').onclick=()=>{clearBet();S.pendingSkip=true;$('coach').textContent='SKIP selected. Deal the hand to score your decision.'};$('deal').onclick=deal;$('newShoe').onclick=()=>{if(confirm('Start a fresh shuffled shoe? Roads will reset, but bankroll/P&L will continue.')){clearBet();startShoe(true);save();$('coach').textContent='Fresh 8-deck shoe started. Roads reset; bankroll preserved.';renderAll()}};$('newSession').onclick=()=>{if(confirm('Start a fresh demo session?'))reset()};$('baseUnit').onchange=()=>{S.unit=Math.max(1,+$('baseUnit').value||100);buildChips();renderAll()};$('playMode').onchange=()=>{$('manualBox').classList.toggle('show',$('playMode').value==='manual')};$('assist').onchange=()=>{renderSignal();renderNextRoadMap();renderPredictions(false)};document.querySelectorAll('[data-result]').forEach(b=>b.onclick=()=>settle(b.dataset.result,null));renderAll()}
+function init(){window.addEventListener('resize',()=>{restorePracticeBetPosition();renderAll()});startShoe(true);buildChips();restorePracticeBetPosition();initPracticeBetDrag();document.querySelectorAll('.bet').forEach(b=>b.onclick=()=>addBet(b.dataset.side));$('clearBet').onclick=clearBet;$('skip').onclick=()=>{clearBet();S.pendingSkip=true;$('coach').textContent='SKIP selected. Deal the hand to score your decision.'};$('deal').onclick=deal;$('newShoe').onclick=()=>{if(confirm('Start a fresh shuffled shoe? Roads will reset, but bankroll/P&L will continue.')){clearBet();startShoe(true);save();$('coach').textContent='Fresh 8-deck shoe started. Roads reset; bankroll preserved.';renderAll()}};$('newSession').onclick=()=>{if(confirm('Start a fresh demo session?'))reset()};$('baseUnit').onchange=()=>{S.unit=Math.max(1,+$('baseUnit').value||100);buildChips();renderAll()};$('playMode').onchange=()=>{$('manualBox').classList.toggle('show',$('playMode').value==='manual')};$('assist').onchange=()=>{renderSignal();renderNextRoadMap();renderPredictions(false)};document.querySelectorAll('[data-result]').forEach(b=>b.onclick=()=>settle(b.dataset.result,null));renderAll()}
 init();
 
 $('lastHandDialogClose').onclick=()=>{let d=$('lastHandDialog');if(typeof d.close==='function')d.close();else d.removeAttribute('open')};
