@@ -4,7 +4,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>QROS Baccarat Trainer v17.1 — Account Startup Fix</title>
+<title>QROS Baccarat Trainer v18 — Account Dashboard & QROS Dialogs</title>
 <style>
 :root{--bg:#07111a;--panel:#0d1b27;--panel2:#102331;--line:#294558;--text:#edf6ff;--muted:#86a3b7;--banker:#ef3340;--player:#2f7df6;--tie:#22c55e;--gold:#f5b942;--good:#35d07f;--bad:#ff5c66;--cyan:#37c5ff;--orange:#f28c28}
 *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% -20%,#163042 0,#07111a 45%);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
@@ -165,13 +165,25 @@ button,select,input{touch-action:manipulation}
   .qrosAuthTitle{font-size:18px}
 }
 
+/* v18 — account dashboard + native QROS dialogs */
+.qrosAccountHero{display:grid;grid-template-columns:48px 1fr;gap:11px;align-items:center;padding:12px;background:#071923;border:1px solid #254657;border-radius:12px;margin-bottom:10px}
+.qrosAccountAvatar{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#ff9d16,#cf6f08);color:white;font-size:24px;font-weight:900;box-shadow:0 8px 24px #0007}
+.qrosAccountEyebrow,.qrosAccountSync{display:block;font-size:9px;color:#7fa6ba;letter-spacing:.08em}.qrosAccountSync{letter-spacing:0;margin-top:3px}
+.qrosSignedInIdentity{padding:0;background:none;border:0;border-radius:0;color:#fff;font-size:14px;font-weight:900;margin:2px 0;overflow-wrap:anywhere}
+.qrosAccountStats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0 12px}
+.qrosAccountStats>div{padding:10px;background:#091d28;border:1px solid #254657;border-radius:10px}.qrosAccountStats span{display:block;color:#7fa6ba;font-size:9px;text-transform:uppercase;letter-spacing:.07em}.qrosAccountStats strong{display:block;color:#f7fbfd;font-size:17px;margin-top:3px}
+.qrosDialogBackdrop{position:fixed;inset:0;z-index:120000;background:rgba(1,9,15,.84);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:16px}
+.qrosDialog{width:min(410px,100%);background:linear-gradient(180deg,#0e2634,#081b26);border:1px solid #31556a;border-radius:16px;padding:20px;color:#f8fbfd;box-shadow:0 24px 80px #000d;text-align:center}
+.qrosDialogIcon{width:46px;height:46px;margin:0 auto 10px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#ff9d16,#cf6f08);font-size:23px;font-weight:900}.qrosDialogTitle{font-size:17px;font-weight:900;letter-spacing:.06em}.qrosDialogMessage{color:#b8d0dc;font-size:12px;line-height:1.55;margin:9px 0 16px;white-space:pre-line}.qrosDialogActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.qrosDialogActions.single{grid-template-columns:1fr}.qrosDialogCancel,.qrosDialogOk{min-height:42px;font-weight:900}.qrosDialogCancel{background:#102b3a!important;color:#d6e6ee!important;border:1px solid #31556a!important}.qrosDialogOk{background:linear-gradient(180deg,#ff9813,#d77408)!important;color:white!important;border:1px solid #ffad43!important}
+@media(max-width:500px){.qrosAccountStats{grid-template-columns:1fr 1fr}.qrosDialog{padding:16px}}
+
 </style>
 </head>
 <body>
 
 <dialog id="lastHandDialog" class="lastHandDialog" aria-labelledby="lastHandDialogTitle"><div class="lastHandDialogInner"><div id="lastHandDialogTitle" class="lastHandDialogTitle">⚠ LAST HAND OF THIS SHOE</div><div id="lastHandDialogResult" class="lastHandDialogResult"></div><div class="lastHandDialogNote">The cut card was reached during this hand. The final result and roads will remain on screen for review. When ready, press <b>START NEW SHOE</b>.</div><button id="lastHandDialogClose" class="lastHandDialogBtn" type="button" autofocus>REVIEW FINAL HAND</button></div></dialog>
 <div class="app">
-  <div class="top"><div class="brand">QROS BACCARAT TRAINER v17.1 <small>NON-COMMISSION • REAL 8-DECK SHOE • VISIBLE CARDS • TIGER-STYLE NEXT ROAD MAP</small></div><div class="mode"><select id="assist"><option value="casino">Casino Mode</option><option value="learning">Learning Mode</option></select><select id="playMode"><option value="shoe">Simulated 8-deck Shoe</option><option value="manual">Manual Road Practice</option></select><button id="accountBtn">Account</button><button id="newShoe">New Shoe</button><button id="newSession">New Session</button></div></div>
+  <div class="top"><div class="brand">QROS BACCARAT TRAINER v18 <small>NON-COMMISSION • REAL 8-DECK SHOE • VISIBLE CARDS • TIGER-STYLE NEXT ROAD MAP</small></div><div class="mode"><select id="assist"><option value="casino">Casino Mode</option><option value="learning">Learning Mode</option></select><select id="playMode"><option value="shoe">Simulated 8-deck Shoe</option><option value="manual">Manual Road Practice</option></select><button id="accountBtn">Account</button><button id="newShoe">New Shoe</button><button id="newSession">New Session</button></div></div>
   <div class="stats">
     <div class="stat"><span>Demo Bankroll</span><strong id="bankroll">$10,000.00</strong></div>
     <div class="stat"><span>Session P/L</span><strong id="pnl">$0.00</strong></div>
@@ -179,7 +191,6 @@ button,select,input{touch-action:manipulation}
     <div class="stat"><span>Shoe / Hand</span><strong id="hands">1 / 0</strong></div><div class="stat"><span>Cards Remaining</span><strong id="cardsRemaining">—</strong></div>
     <div class="stat"><span>Bet W / L</span><strong id="wl">0 / 0</strong></div>
     <div class="stat"><span>Recognition</span><strong id="accuracy">—</strong></div>
-    <div class="stat"><span>+2 Unit Target</span><strong id="targetText">$200.00</strong><div class="target"><i id="targetBar"></i></div></div>
   </div>
 
   <div class="layout">
@@ -210,7 +221,7 @@ button,select,input{touch-action:manipulation}
       <section id="manualBox" class="card manual"><h3>MANUAL RESULT</h3><div class="manualBtns"><button class="b" data-result="BANKER">BANKER</button><button class="p" data-result="PLAYER">PLAYER</button><button class="t" data-result="TIE">TIE</button></div></section>
       <section class="card"><h3>CASINO SHOE</h3><div class="shoeInfo"><div><span>Profile</span><b>QROS STANDARD</b></div><div><span>Decks</span><b>8 (416 cards)</b></div><div><span>Payout</span><b>Non-commission 1:1</b></div><div><span>Burn reveal</span><b id="burnInfo">—</b></div><div><span>Cut card</span><b id="cutInfo">—</b></div><div><span>Cards dealt</span><b id="cardsDealt">—</b></div><div><span>Random source</span><b id="rngInfo">Web Crypto</b></div></div></section><section class="card"><h3>LAST HAND / COACH</h3><div id="coach" style="font-size:12px;line-height:1.5;color:#cfe1ec">Place a demo bet or skip, then deal. Casino Mode hides the QROS answer until the hand is resolved.</div></section>
       <section class="card"><h3>SESSION HISTORY</h3><div id="history" class="history"></div></section>
-      <section class="card"><h3>SETTINGS</h3><label style="font-size:11px;color:var(--muted)">Starting demo money</label><input id="startMoney" type="number" value="10000" min="100" step="100" style="width:100%;margin:4px 0 8px;background:#091620;color:white;border:1px solid #315163;border-radius:7px;padding:7px"><label style="font-size:11px;color:var(--muted)">Base unit / +2 target</label><input id="baseUnit" type="number" value="100" min="1" step="10" style="width:100%;margin:4px 0;background:#091620;color:white;border:1px solid #315163;border-radius:7px;padding:7px"><div style="margin-top:8px;font-size:10px;line-height:1.45;color:var(--muted)">Casino Mode uses QROS STANDARD shoe preparation: 8 decks, baccarat burn procedure, random cut card at 60–75 cards remaining, exact third-card rules, and a fresh shuffled shoe after the cut card. Demo money only.</div></section>
+      <section class="card"><h3>SETTINGS</h3><label style="font-size:11px;color:var(--muted)">Starting demo money</label><input id="startMoney" type="number" value="10000" min="100" step="100" style="width:100%;margin:4px 0 8px;background:#091620;color:white;border:1px solid #315163;border-radius:7px;padding:7px"><label style="font-size:11px;color:var(--muted)">Base unit</label><input id="baseUnit" type="number" value="100" min="1" step="10" style="width:100%;margin:4px 0;background:#091620;color:white;border:1px solid #315163;border-radius:7px;padding:7px"><div style="margin-top:8px;font-size:10px;line-height:1.45;color:var(--muted)">Casino Mode uses QROS STANDARD shoe preparation: 8 decks, baccarat burn procedure, random cut card at 60–75 cards remaining, exact third-card rules, and a fresh shuffled shoe after the cut card. Demo money only.</div></section>
     </aside>
   </div>
 </div>
@@ -226,6 +237,7 @@ button,select,input{touch-action:manipulation}
       <button id="accountClose" class="qrosAuthClose" aria-label="Close">×</button>
     </div>
 
+    <div id="signedOutAuthPanel">
     <div class="qrosAuthTabs">
       <button id="authTabSignIn" class="qrosAuthTab active">SIGN IN</button>
       <button id="authTabRegister" class="qrosAuthTab">REGISTER</button>
@@ -262,13 +274,27 @@ button,select,input{touch-action:manipulation}
     </div>
 
     <button id="accountPrimaryAction" class="qrosAuthPrimary">SIGN IN</button>
+    </div>
 
     <div id="signedOutActions" class="qrosAuthSecondaryActions">
       <button id="accountResend" style="display:none">RESEND VERIFICATION EMAIL</button>
     </div>
 
     <div id="signedInPanel" class="qrosSignedInPanel" style="display:none">
-      <div id="signedInIdentity" class="qrosSignedInIdentity"></div>
+      <div class="qrosAccountHero">
+        <div class="qrosAccountAvatar">Q</div>
+        <div><span class="qrosAccountEyebrow">SIGNED IN</span><div id="signedInIdentity" class="qrosSignedInIdentity"></div><span class="qrosAccountSync">Cloud sync available • local autosave active</span></div>
+      </div>
+      <div class="qrosAccountStats">
+        <div><span>Total Hands</span><strong id="accountHands">0</strong></div>
+        <div><span>Total Shoes</span><strong id="accountShoes">0</strong></div>
+        <div><span>Bet Wins</span><strong id="accountWins">0</strong></div>
+        <div><span>Bet Losses</span><strong id="accountLosses">0</strong></div>
+        <div><span>Win Rate</span><strong id="accountWinRate">—</strong></div>
+        <div><span>Recognition</span><strong id="accountRecognition">—</strong></div>
+        <div><span>Bankroll</span><strong id="accountBankroll">$0.00</strong></div>
+        <div><span>Session P/L</span><strong id="accountPnl">$0.00</strong></div>
+      </div>
       <div class="qrosCloudActions">
         <button id="accountCloudSave">SAVE TO CLOUD</button>
         <button id="accountCloudLoad">RESTORE CLOUD</button>
@@ -280,6 +306,18 @@ button,select,input{touch-action:manipulation}
 
     <button id="accountSignIn" style="display:none"></button>
     <button id="accountSignUp" style="display:none"></button>
+  </div>
+</div>
+
+<div id="qrosDialogBackdrop" class="qrosDialogBackdrop" style="display:none" role="presentation">
+  <div class="qrosDialog" role="dialog" aria-modal="true" aria-labelledby="qrosDialogTitle">
+    <div id="qrosDialogIcon" class="qrosDialogIcon">Q</div>
+    <div id="qrosDialogTitle" class="qrosDialogTitle">QROS TRAINER</div>
+    <div id="qrosDialogMessage" class="qrosDialogMessage"></div>
+    <div id="qrosDialogActions" class="qrosDialogActions">
+      <button id="qrosDialogCancel" class="qrosDialogCancel">CANCEL</button>
+      <button id="qrosDialogOk" class="qrosDialogOk">OK</button>
+    </div>
   </div>
 </div>
 
@@ -365,18 +403,40 @@ function setAuthMode(mode){
 function updateSignedInUI(){
   const signed=!!qrosUser;
   $('signedInPanel').style.display=signed?'block':'none';
+  $('signedOutAuthPanel').style.display=signed?'none':'block';
   $('signedOutActions').style.display=signed?'none':'grid';
-  $('accountPrimaryAction').style.display=signed?'none':'block';
-  $('authTabSignIn').disabled=signed;
-  $('authTabRegister').disabled=signed;
-  $('accountEmail').disabled=signed;
-  $('accountPassword').disabled=signed;
-  $('accountPasswordConfirm').disabled=signed;
   if(signed){
-    $('signedInIdentity').textContent='SIGNED IN AS  '+(qrosUser.email||qrosUser.id);
-    accountStatus('Your QROS account is connected. Local autosave remains active and you can sync this session to the cloud.','success','ACCOUNT CONNECTED');
+    $('signedInIdentity').textContent=qrosUser.email||qrosUser.id;
+    accountStatus('Your QROS account is connected. Your trainer statistics below are taken from the current saved session.','success','ACCOUNT CONNECTED');
+    renderAccountStats();
   }
 }
+function renderAccountStats(){
+  if(!$('accountHands'))return;
+  const hands=Array.isArray(S.history)?S.history.length:0;
+  const wins=Number(S.wins)||0, losses=Number(S.losses)||0, settled=wins+losses;
+  const pl=(Number(S.bankroll)||0)-(Number(S.start)||0);
+  $('accountHands').textContent=hands.toLocaleString();
+  $('accountShoes').textContent=(Number(S.shoeNo)||0).toLocaleString();
+  $('accountWins').textContent=wins.toLocaleString();
+  $('accountLosses').textContent=losses.toLocaleString();
+  $('accountWinRate').textContent=settled?Math.round(wins/settled*100)+'%':'—';
+  $('accountRecognition').textContent=S.decisions?Math.round(S.recognized/S.decisions*100)+'%':'—';
+  $('accountBankroll').textContent=money(Number(S.bankroll)||0);
+  $('accountPnl').textContent=(pl>=0?'+':'')+money(pl);
+  $('accountPnl').className=pl>0?'positive':pl<0?'negative':'';
+}
+let qrosDialogResolve=null;
+function qrosDialog(message,{title='QROS TRAINER',ok='OK',cancel=null,icon='Q'}={}){
+  return new Promise(resolve=>{
+    qrosDialogResolve=resolve;
+    $('qrosDialogTitle').textContent=title;$('qrosDialogMessage').textContent=message;$('qrosDialogIcon').textContent=icon;
+    $('qrosDialogOk').textContent=ok;$('qrosDialogCancel').textContent=cancel||'CANCEL';
+    $('qrosDialogCancel').style.display=cancel?'block':'none';$('qrosDialogActions').classList.toggle('single',!cancel);
+    $('qrosDialogBackdrop').style.display='flex';setTimeout(()=>$('qrosDialogOk').focus(),0);
+  });
+}
+function closeQrosDialog(value){$('qrosDialogBackdrop').style.display='none';const r=qrosDialogResolve;qrosDialogResolve=null;if(r)r(value)}
 function friendlyAuthError(error){
   const m=(error?.message||String(error||'')).trim();
   if(/invalid login credentials/i.test(m))return 'Email or password is incorrect, or the email has not been verified yet.';
@@ -594,13 +654,13 @@ function addBigRoadTieDots(mark,count){
 function renderRoad(el,positions,type){el.innerHTML='';let maxCol=0;positions.forEach((x,i)=>{maxCol=Math.max(maxCol,x.col);let d=document.createElement('div');d.style.gridColumn=x.col+1;d.style.gridRow=x.row+1;if(type==='cock'){d.className='slash '+(x.v==='BLUE'?'blue':'')}else{d.className='mark '+(type==='small'?'derived fill '+(x.v==='BLUE'?'blue':'red'):type==='derived'?'derived '+(x.v==='BLUE'?'blue':'red'):x.v==='BANKER'?'b':x.v==='PLAYER'?'p':'t');if(type==='big'){d.textContent=x.v==='BANKER'?'B':'P';if(x.v==='BANKER'&&x.bankerSix){let badge=document.createElement('span');badge.className='bankerSixBadge '+x.bankerSix.toLowerCase();badge.textContent=x.bankerSix;badge.title=x.bankerSix==='B6'?'Banker wins with 6 using 3 cards':'Banker wins with 6 using 2 cards';d.appendChild(badge)}addBigRoadTieDots(d,x.tieCount||0)}if(type==='bead')d.textContent=x.v==='BANKER'?'B':x.v==='PLAYER'?'P':'T'}el.appendChild(d)});let cell=el.classList.contains('big')?35:30,wrap=el.parentElement,visible=Math.max(0,wrap?wrap.clientWidth:0),content=(maxCol+3)*cell;el.style.width=Math.max(visible,content)+'px';el.style.minWidth=Math.max(visible,content)+'px'}
 function scrollRoadsToLatest(){requestAnimationFrame(()=>{document.querySelectorAll('.gridWrap').forEach(w=>{if(w.scrollWidth>w.clientWidth+2)w.scrollLeft=w.scrollWidth-w.clientWidth})})}
 function renderAll(){let t=tracker(S.results),nonTieHistory=(S.history||[]).filter(h=>h.result!=='TIE'),tieCounts=[],nonTieIndex=-1,leadingTies=0;for(let r of S.results){if(r==='TIE'){if(nonTieIndex>=0)tieCounts[nonTieIndex]=(tieCounts[nonTieIndex]||0)+1;else leadingTies++}else{nonTieIndex++;tieCounts[nonTieIndex]=leadingTies;leadingTies=0}}renderRoad($('bigRoad'),t.cells.map((c,i)=>({v:c.side,col:c.col,row:c.row,bankerSix:nonTieHistory[i]?.bankerSix||null,tieCount:tieCounts[i]||0})),'big');let bead=S.results.map((v,i)=>({v,col:Math.floor(i/6),row:i%6}));renderRoad($('beadRoad'),bead,'bead');let d=derived(S.results);renderRoad($('bigEye'),roadLayout(d.BIG_EYE),'derived');renderRoad($('smallRoad'),roadLayout(d.SMALL_ROAD),'small');renderRoad($('cockroach'),roadLayout(d.COCKROACH),'cock');
- $('bankroll').textContent=money(S.bankroll);let pl=S.bankroll-S.start;$('pnl').textContent=(pl>=0?'+':'')+money(pl);$('pnl').className=pl>0?'positive':pl<0?'negative':'';$('unit').textContent='$'+S.unit;$('hands').textContent=S.shoeNo+' / '+S.shoeHand;$('cardsRemaining').textContent=S.shoe.length;$('burnInfo').textContent=S.burnReveal?(S.burnReveal.rank+' '+S.burnReveal.suit+' + '+S.burnAfter):'—';$('cutInfo').textContent=S.cutRemaining+' remain';$('cardsDealt').textContent=S.cardsDealt;$('rngInfo').textContent=(globalThis.crypto&&crypto.getRandomValues)?'Web Crypto':'PRNG fallback';$('wl').textContent=S.wins+' / '+S.losses;$('accuracy').textContent=S.decisions?Math.round(S.recognized/S.decisions*100)+'%':'—';$('targetText').textContent=money(S.unit*2);$('targetBar').style.width=Math.max(0,Math.min(100,pl/(S.unit*2)*100))+'%';['BANKER','PLAYER','TIE'].forEach(k=>$('bet'+k).textContent='$'+S.bets[k]);$('chipText').textContent='$'+S.selectedChip;let dealBtn=$('deal');if(dealBtn)dealBtn.textContent=S.shoeEnded?'START NEW SHOE':'DEAL NEXT HAND';
- renderLastHand();renderSignal();renderNextRoadMap();renderPredictions(false);renderHistory();scrollRoadsToLatest();}
+ $('bankroll').textContent=money(S.bankroll);let pl=S.bankroll-S.start;$('pnl').textContent=(pl>=0?'+':'')+money(pl);$('pnl').className=pl>0?'positive':pl<0?'negative':'';$('unit').textContent='$'+S.unit;$('hands').textContent=S.shoeNo+' / '+S.shoeHand;$('cardsRemaining').textContent=S.shoe.length;$('burnInfo').textContent=S.burnReveal?(S.burnReveal.rank+' '+S.burnReveal.suit+' + '+S.burnAfter):'—';$('cutInfo').textContent=S.cutRemaining+' remain';$('cardsDealt').textContent=S.cardsDealt;$('rngInfo').textContent=(globalThis.crypto&&crypto.getRandomValues)?'Web Crypto':'PRNG fallback';$('wl').textContent=S.wins+' / '+S.losses;$('accuracy').textContent=S.decisions?Math.round(S.recognized/S.decisions*100)+'%':'—';['BANKER','PLAYER','TIE'].forEach(k=>$('bet'+k).textContent='$'+S.bets[k]);$('chipText').textContent='$'+S.selectedChip;let dealBtn=$('deal');if(dealBtn)dealBtn.textContent=S.shoeEnded?'START NEW SHOE':'DEAL NEXT HAND';
+ renderLastHand();renderSignal();renderNextRoadMap();renderPredictions(false);renderHistory();renderAccountStats();scrollRoadsToLatest();}
 function renderSignal(){let sigs=currentSignals(),learn=$('assist').value==='learning';if(!sigs.length){$('signalName').textContent='WAIT';$('signalSub').textContent='No approved QROS setup right now.';$('signalGo').textContent='No valid setup = no bet.';return}let s=sigs[0];$('signalName').textContent=learn?s.label:'SETUP STATUS HIDDEN';$('signalSub').textContent=learn?(sigs.length>1?`${sigs.length} approved signals agree on ${s.side}.`:`Expected side: ${s.side}`):'Casino Mode: make your own decision first.';$('signalGo').textContent=learn?`Practice action: ${s.side}`:'Signal will be revealed after the hand.'}
 function renderHistory(){$('history').innerHTML=S.history.slice().reverse().map(h=>`<div class="hrow"><span>#${h.n}</span><b>${h.result[0]}</b><span>${h.action}</span><b class="${h.pnl>0?'win':h.pnl<0?'loss':''}">${h.pnl===0?'—':(h.pnl>0?'+':'')+money(h.pnl)}</b></div>`).join('')||'<div style="color:var(--muted)">No hands yet.</div>'}
 function renderPreHandReveal(reveal){if(!reveal)return;let a=reveal.analysis,sigs=reveal.signals,html='';for(let r of a.rows){let badge=r.last?`<span class="roadColor ${r.last.toLowerCase()}">${r.last}</span>`:'<span class="miniBadge">not started</span>';html+=`<div class="predRow"><div class="predHead"><b>${roadLabel(r.road)} <span class="miniBadge">PRE-HAND</span></b>${badge}</div><div class="predMeta">Alternating trigger length: <b>${r.len}</b><br>If BANKER → <b>${r.banker||'no new mark'}</b><br>If PLAYER → <b>${r.player||'no new mark'}</b></div></div>`}$('predictionPanel').innerHTML=html;if(!sigs.length)$('confluence').innerHTML='Pre-hand QROS action: <b>SKIP</b>';else $('confluence').innerHTML=`<b>Pre-hand QROS confluence:</b> ${sigs.length} signal${sigs.length===1?'':'s'} • <span class="direction">${sigs[0].side}</span><br>${sigs.map(x=>x.label.replace('ACTIVE ','')).join('<br>')}` }
 function selectChip(v){S.selectedChip=v;document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('sel',+x.dataset.v===v));renderAll()}
-function addBet(side){let v=S.selectedChip;if(S.bankroll<v)return alert('Not enough demo bankroll.');let other=Object.keys(S.bets).some(k=>k!==side&&S.bets[k]>0);if(other)return alert('Trainer allows one bet side per hand. Clear the current bet first.');S.bets[side]+=v;S.bankroll-=v;S.pendingSkip=false;renderAll()}
+function addBet(side){let v=S.selectedChip;if(S.bankroll<v){qrosDialog('Not enough demo bankroll for this chip value.',{title:'INSUFFICIENT BANKROLL',icon:'!'});return}let other=Object.keys(S.bets).some(k=>k!==side&&S.bets[k]>0);if(other){qrosDialog('Trainer allows one bet side per hand. Clear the current bet first.',{title:'ONE BET SIDE PER HAND',icon:'!'});return}S.bets[side]+=v;S.bankroll-=v;S.pendingSkip=false;renderAll()}
 function clearBet(){let refund=Object.values(S.bets).reduce((a,b)=>a+b,0);S.bankroll+=refund;S.bets={BANKER:0,PLAYER:0,TIE:0};S.pendingSkip=false;renderAll()}
 function settle(result,hand){let preSignals=currentSignals(),preAnalysis=derivedAnalysis(S.results),preActive=S.active?{...S.active}:null,stake=Object.values(S.bets).reduce((a,b)=>a+b,0),betSide=Object.keys(S.bets).find(k=>S.bets[k]>0)||null,p=0;if(betSide){let amt=S.bets[betSide];if((betSide==='BANKER'||betSide==='PLAYER')&&result==='TIE'){S.bankroll+=amt;p=0}else if(result===betSide){if(result==='BANKER'||result==='PLAYER'){S.bankroll+=amt*2;p=amt}else{S.bankroll+=amt*9;p=amt*8}S.wins++}else{p=-amt;S.losses++}}
  let correctSide=preSignals.length?preSignals[0].side:null,correctAction=correctSide||'SKIP',action=betSide||'SKIP';S.decisions++;if(action===correctAction)S.recognized++;
@@ -610,7 +670,7 @@ function settle(result,hand){let preSignals=currentSignals(),preAnalysis=derived
  if(preSignals.length){let s=preSignals[0];if(s.active){if(result==='TIE'){S.active=preActive}else if(result===s.side){S.active=preActive;advanceActive(S.active)}else S.active=null}else{if(result===s.side){S.active=activeAfterWin(s);advanceActive(S.active)}else if(result!=='TIE')S.active=null}}
  S.lastHand=hand;S.lastHandFinal=!!(hand&&hand.isLastHand);if(S.lastHandFinal)S.shoeEnded=true;S.lastReveal={signals:preSignals,analysis:preAnalysis};S.results.push(result);let bankerSix=(result==='BANKER'&&hand&&hand.bt===6)?(hand.b.length===3?'B6':hand.b.length===2?'S6':null):null;S.history.push({n:S.results.length,result,action,pnl:p,bankerSix});S.bets={BANKER:0,PLAYER:0,TIE:0};S.pendingSkip=false;if(S.lastHandFinal){$('coach').innerHTML=`<b style="color:#ffb84d">⚠ LAST HAND OF SHOE ${S.shoeNo}</b><br><b>Final result:</b> ${result}${hand?` • Player ${hand.pt} vs Banker ${hand.bt}`:''}<br>The cut card was reached during this hand. Review the result and roads, then press <b>START NEW SHOE</b>.`;setTimeout(()=>showLastHandDialog(result,hand),0)}save();renderAll();if($('assist').value==='casino')renderPreHandReveal(S.lastReveal)}
 function showLastHandDialog(result,hand){let d=$('lastHandDialog'),r=$('lastHandDialogResult');if(!d||!r)return;r.innerHTML=`<b>Shoe ${S.shoeNo} final result:</b> <span style="color:${result==='BANKER'?'var(--banker)':result==='PLAYER'?'var(--player)':'var(--tie)'};font-weight:900">${result}</span>${hand?`<br>Player ${hand.pt} vs Banker ${hand.bt}`:''}`;if(typeof d.showModal==='function'){if(!d.open)d.showModal()}else d.setAttribute('open','')}
-function deal(){if($('playMode').value==='manual')return alert('Manual mode: choose Banker, Player, or Tie in the Manual Result box.');if(S.shoeEnded){clearBet();startShoe(true);save();$('coach').innerHTML='<b>New casino shoe ready.</b> The previous last-hand result was held on screen until you started this shoe. Roads are reset; bankroll/P&L continue.';renderAll();return}ensureShoe();let h=baccaratHand();settle(h.result,h)}
+function deal(){if($('playMode').value==='manual'){qrosDialog('Manual mode is active. Choose Banker, Player, or Tie in the Manual Result box.',{title:'MANUAL ROAD PRACTICE'});return}if(S.shoeEnded){clearBet();startShoe(true);save();$('coach').innerHTML='<b>New casino shoe ready.</b> The previous last-hand result was held on screen until you started this shoe. Roads are reset; bankroll/P&L continue.';renderAll();return}ensureShoe();let h=baccaratHand();settle(h.result,h)}
 function reset(){let start=Math.max(100,+$('startMoney').value||10000),unit=Math.max(1,+$('baseUnit').value||100);S={start,bankroll:start,unit,selectedChip:unit,bets:{BANKER:0,PLAYER:0,TIE:0},results:[],shoe:[],shoeNo:0,shoeHand:0,cutRemaining:0,burnReveal:null,burnAfter:0,cardsDealt:0,cutReached:false,cutSeenThisHand:false,shoeEnded:false,lastHandFinal:false,wins:0,losses:0,recognized:0,decisions:0,history:[],pendingSkip:false,active:null,lastHand:null,lastReveal:null};startShoe(true);buildChips();save();$('coach').textContent='New practice session started with a freshly shuffled QROS STANDARD 8-deck shoe.';renderAll()}
 function buildChips(){let vals=[10,25,50,100,500,1000,S.unit].filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b);$('chips').innerHTML='';vals.forEach(v=>{let b=document.createElement('button');b.className='chip'+(v===S.selectedChip?' sel':'');b.dataset.v=v;b.textContent=v>=1000?(v/1000)+'K':v;b.onclick=()=>selectChip(v);$('chips').appendChild(b)})}
 function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
@@ -627,13 +687,16 @@ function init(){
   restorePracticeBetPosition();
   initPracticeBetDrag();
   initAccountUI();
+  $('qrosDialogOk').onclick=()=>closeQrosDialog(true);
+  $('qrosDialogCancel').onclick=()=>closeQrosDialog(false);
+  $('qrosDialogBackdrop').addEventListener('click',e=>{if(e.target===$('qrosDialogBackdrop')&&$('qrosDialogCancel').style.display!=='none')closeQrosDialog(false)});
   initAccount();
   document.querySelectorAll('.bet').forEach(b=>b.onclick=()=>addBet(b.dataset.side));
   $('clearBet').onclick=clearBet;
   $('skip').onclick=()=>{clearBet();S.pendingSkip=true;$('coach').textContent='SKIP selected. Deal the hand to score your decision.'};
   $('deal').onclick=deal;
-  $('newShoe').onclick=()=>{if(confirm('Start a fresh shuffled shoe? Roads will reset, but bankroll/P&L will continue.')){clearBet();startShoe(true);save();$('coach').textContent='Fresh 8-deck shoe started. Roads reset; bankroll preserved.';renderAll()}};
-  $('newSession').onclick=()=>{if(confirm('Start a fresh demo session?'))reset()};
+  $('newShoe').onclick=async()=>{if(await qrosDialog('Roads will reset, but your bankroll and session P/L will continue.',{title:'START A FRESH SHOE?',ok:'START NEW SHOE',cancel:'CANCEL'})){clearBet();startShoe(true);save();$('coach').textContent='Fresh 8-deck shoe started. Roads reset; bankroll preserved.';renderAll()}};
+  $('newSession').onclick=async()=>{if(await qrosDialog('This starts a completely fresh practice session and resets the session bankroll, roads and statistics.',{title:'START A NEW SESSION?',ok:'START NEW SESSION',cancel:'CANCEL'}))reset()};
   $('baseUnit').onchange=()=>{S.unit=Math.max(1,+$('baseUnit').value||100);buildChips();renderAll()};
   $('playMode').onchange=()=>{$('manualBox').classList.toggle('show',$('playMode').value==='manual')};
   $('assist').onchange=()=>{renderSignal();renderNextRoadMap();renderPredictions(false)};
