@@ -4,7 +4,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>QROS Baccarat Trainer v18.3.1 — Implied Average Bet</title>
+<title>QROS Baccarat Trainer v18.3.2 — Implied Average Bet</title>
 <style>
 :root{--bg:#07111a;--panel:#0d1b27;--panel2:#102331;--line:#294558;--text:#edf6ff;--muted:#86a3b7;--banker:#ef3340;--player:#2f7df6;--tie:#22c55e;--gold:#f5b942;--good:#35d07f;--bad:#ff5c66;--cyan:#37c5ff;--orange:#f28c28}
 *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% -20%,#163042 0,#07111a 45%);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
@@ -257,7 +257,7 @@ select option:focus{
 
 <dialog id="lastHandDialog" class="lastHandDialog" aria-labelledby="lastHandDialogTitle"><div class="lastHandDialogInner"><div id="lastHandDialogTitle" class="lastHandDialogTitle">⚠ LAST HAND OF THIS SHOE</div><div id="lastHandDialogResult" class="lastHandDialogResult"></div><div class="lastHandDialogNote">The cut card was reached during this hand. The final result and roads will remain on screen for review. When ready, press <b>START NEW SHOE</b>.</div><button id="lastHandDialogClose" class="lastHandDialogBtn" type="button" autofocus>REVIEW FINAL HAND</button></div></dialog>
 <div class="app">
-  <div class="top"><div class="brand">QROS BACCARAT TRAINER v18.3.1 <small>NON-COMMISSION • REAL 8-DECK SHOE • VISIBLE CARDS • TIGER-STYLE NEXT ROAD MAP</small></div><div class="mode"><select id="assist"><option value="casino">Casino Mode</option><option value="learning">Learning Mode</option></select><select id="playMode"><option value="shoe">Simulated 8-deck Shoe</option><option value="manual">Manual Road Practice</option></select><button id="accountBtn">Account</button><button id="newShoe">New Shoe</button><button id="newSession">New Session</button></div></div>
+  <div class="top"><div class="brand">QROS BACCARAT TRAINER v18.3.2 <small>NON-COMMISSION • REAL 8-DECK SHOE • VISIBLE CARDS • TIGER-STYLE NEXT ROAD MAP</small></div><div class="mode"><select id="assist"><option value="casino">Casino Mode</option><option value="learning">Learning Mode</option></select><select id="playMode"><option value="shoe">Simulated 8-deck Shoe</option><option value="manual">Manual Road Practice</option></select><button id="accountBtn">Account</button><button id="newShoe">New Shoe</button><button id="newSession">New Session</button></div></div>
   <div class="stats">
     <div class="stat"><span>Demo Bankroll</span><strong id="bankroll">$10,000.00</strong></div>
     <div class="stat"><span>Session P/L</span><strong id="pnl">$0.00</strong></div>
@@ -360,7 +360,7 @@ select option:focus{
         <div><span class="qrosAccountEyebrow">SIGNED IN</span><div id="signedInIdentity" class="qrosSignedInIdentity"></div><span class="qrosAccountSync">Cloud sync available • local autosave active</span></div>
       </div>
       <div class="qrosAccountStats">
-        <div><span>Total Hands</span><strong id="accountHands">0</strong></div>
+        <div><span>Total Bets / Total Hands</span><strong id="accountHands">0 / 0</strong></div>
         <div><span>Total Shoes</span><strong id="accountShoes">0</strong></div>
         <div><span>Bet Wins</span><strong id="accountWins">0</strong></div>
         <div><span>Bet Losses</span><strong id="accountLosses">0</strong></div>
@@ -523,7 +523,7 @@ function renderAccountStats(){
   const hands=Array.isArray(S.history)?S.history.length:0;
   const wins=Number(S.wins)||0, losses=Number(S.losses)||0, settled=wins+losses;
   const pl=(Number(S.bankroll)||0)-(Number(S.start)||0);
-  $('accountHands').textContent=hands.toLocaleString();
+  $('accountHands').textContent=settled.toLocaleString()+' / '+hands.toLocaleString();
   $('accountShoes').textContent=(Number(S.shoeNo)||0).toLocaleString();
   $('accountWins').textContent=wins.toLocaleString();
   $('accountLosses').textContent=losses.toLocaleString();
