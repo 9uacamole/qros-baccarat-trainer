@@ -1,10 +1,34 @@
-QROS Baccarat Trainer v15 — Mobile Responsive
-==============================================
+QROS Baccarat Trainer v17 — Account UX + Cloud Persistence
+============================================================
 
-Adds responsive Android/iPhone layouts for portrait and landscape modes.
-On phones, the Practice Bet panel becomes a compact bottom control dock so it does not cover most of the roads.
-Desktop drag-position behavior remains available on wider screens.
-iPhone safe-area insets and touch scrolling are supported.
+QROS Baccarat Trainer v17 builds on the v15 mobile-responsive trainer and the v16 account/cloud foundation.
+
+V17 ACCOUNT UX + CLOUD PERSISTENCE
+- Added a dedicated QROS Account popup with separate SIGN IN and REGISTER tabs.
+- Added clear registration, sign-in, success, warning, and error status messages.
+- Added confirm-password validation during registration.
+- Added explicit email-verification instructions after account registration.
+- Added RESEND VERIFICATION EMAIL support.
+- Added clearer handling for incorrect credentials and unverified accounts.
+- Added signed-in account identity display.
+- Added SAVE TO CLOUD and RESTORE CLOUD controls for authenticated users.
+- Local autosave remains active while signed out and continues protecting the trainer session on the same browser/device.
+- Account popup is responsive for desktop and mobile use.
+
+V16 SUPABASE ACCOUNT + STORAGE FOUNDATION
+- Added the Account control to the trainer interface.
+- Added Supabase authentication integration for QROS user accounts.
+- Added authenticated cloud persistence using the trainer_state table.
+- Added per-user cloud state protection through Supabase Row Level Security policies.
+- Added cloud save/restore foundation so a signed-in trainer state can persist independently of local browser storage.
+- Existing local trainer persistence remains available alongside cloud persistence.
+- Existing baccarat simulation, road logic, bankroll/session behavior, and practice controls are preserved.
+
+V15 MOBILE RESPONSIVE
+- Added responsive Android/iPhone layouts for portrait and landscape modes.
+- On phones, the Practice Bet panel becomes a compact bottom control dock so it does not cover most of the roads.
+- Desktop drag-position behavior remains available on wider screens.
+- iPhone safe-area insets and touch scrolling are supported.
 
 QROS Baccarat Trainer v11 — Standard Big Road + Tie Dots
 
@@ -23,7 +47,13 @@ Features:
 - QROS learning/casino modes and decision-vs-outcome grading
 - Demo bankroll and chips only
 
-Run START_TRAINER.bat or open index.html.
+Run START_TRAINER.bat or open index.html for local use.
+
+ONLINE / GITHUB PAGES
+- The trainer can also run from the GitHub Pages deployment.
+- Local autosave is browser/device-specific.
+- For cross-device/session persistence, sign in to the QROS Account and use cloud persistence.
+- A GitHub deployment update is not itself a cloud backup; confirm the account is signed in and the trainer state has been saved/restored successfully.
 
 Important: The next-result road map is a derived-road projection, not a guarantee or prediction of the undealt baccarat result.
 
