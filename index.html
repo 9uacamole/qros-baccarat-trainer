@@ -4,7 +4,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>QROS Baccarat Trainer v15 — Mobile Responsive</title>
+<title>QROS Baccarat Trainer v17 — Account UX</title>
 <style>
 :root{--bg:#07111a;--panel:#0d1b27;--panel2:#102331;--line:#294558;--text:#edf6ff;--muted:#86a3b7;--banker:#ef3340;--player:#2f7df6;--tie:#22c55e;--gold:#f5b942;--good:#35d07f;--bad:#ff5c66;--cyan:#37c5ff;--orange:#f28c28}
 *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% -20%,#163042 0,#07111a 45%);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
@@ -125,13 +125,53 @@ button,select,input{touch-action:manipulation}
   #practiceBetCard .actions button{padding:6px 3px;min-height:32px;font-size:10px}
 }
 
+
+/* v17 — clear QROS login/register UI */
+.qrosAuthBackdrop{position:fixed;inset:0;z-index:100000;background:rgba(1,9,15,.84);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:16px}
+.qrosAuthModal{width:min(470px,100%);max-height:min(720px,calc(100dvh - 24px));overflow:auto;background:linear-gradient(180deg,#0e2634,#081b26);border:1px solid #31556a;border-radius:16px;padding:18px;color:#f8fbfd;box-shadow:0 24px 80px #000c}
+.qrosAuthHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px}
+.qrosAuthTitle{font-weight:900;letter-spacing:.08em;font-size:20px}
+.qrosAuthSub{font-size:11px;color:#85a9bc;margin-top:3px;line-height:1.4}
+.qrosAuthClose{width:36px;height:36px;border-radius:10px;padding:0;font-size:24px;line-height:1;background:#112f40;border:1px solid #416376;color:#fff}
+.qrosAuthTabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#071720;padding:4px;border-radius:11px;margin-bottom:12px}
+.qrosAuthTab{border:0;background:transparent;color:#7f9fb0;font-weight:800;padding:9px}
+.qrosAuthTab.active{background:#123449;color:#fff;box-shadow:inset 0 0 0 1px #31556a}
+.qrosAuthNotice{display:flex;flex-direction:column;gap:3px;border-radius:10px;padding:11px 12px;margin-bottom:12px;border:1px solid #31556a;font-size:12px;line-height:1.35}
+.qrosAuthNotice strong{font-size:11px;letter-spacing:.05em}
+.qrosAuthNotice.info{background:#0b2b3b;color:#bce6fb}
+.qrosAuthNotice.success{background:#0d3428;border-color:#286b51;color:#c9ffe9}
+.qrosAuthNotice.warning{background:#3a2c0e;border-color:#8b6821;color:#ffe6a6}
+.qrosAuthNotice.error{background:#3b1619;border-color:#8a3238;color:#ffd0d3}
+.qrosAuthField{margin:10px 0}
+.qrosAuthField label{display:block;font-size:10px;color:#8fb2c3;font-weight:800;letter-spacing:.06em;margin-bottom:5px}
+.qrosAuthField input{width:100%;box-sizing:border-box;padding:12px;border-radius:9px;border:1px solid #31556a;background:#061923;color:#fff;outline:none}
+.qrosAuthField input:focus{border-color:#69bce4;box-shadow:0 0 0 2px #69bce422}
+.qrosPasswordWrap{display:grid;grid-template-columns:1fr auto;gap:6px}
+.qrosPasswordToggle{min-width:66px}
+.qrosAuthHint{font-size:10px;color:#6f93a6;margin-top:5px}
+.qrosVerifyBox{display:flex;flex-direction:column;gap:3px;padding:10px 11px;border-radius:10px;background:#31290c;border:1px solid #76621f;color:#ffe7a1;font-size:11px;line-height:1.35;margin:10px 0}
+.qrosVerifyBox strong{font-size:10px;letter-spacing:.05em}
+.qrosAuthPrimary{width:100%;min-height:44px;margin-top:8px;background:linear-gradient(180deg,#de8c22,#b56312)!important;color:#fff!important;font-size:13px!important;font-weight:900!important}
+.qrosAuthSecondaryActions{display:grid;gap:6px;margin-top:8px}
+.qrosSignedInPanel{margin-top:12px;border-top:1px solid #254657;padding-top:12px}
+.qrosSignedInIdentity{padding:9px 10px;background:#0b2b3b;border:1px solid #31556a;border-radius:9px;color:#bce6fb;font-size:12px;margin-bottom:8px;overflow-wrap:anywhere}
+.qrosCloudActions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.qrosSignOut{width:100%;margin-top:7px}
+.qrosAuthFooter{font-size:10px;color:#6d8d9d;text-align:center;margin-top:12px;line-height:1.4}
+.qrosAuthPrimary:disabled,.qrosAuthModal button:disabled{opacity:.55;cursor:wait}
+@media(max-width:700px){
+  .qrosAuthBackdrop{padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+  .qrosAuthModal{max-height:calc(100dvh - 16px);padding:14px}
+  .qrosAuthTitle{font-size:18px}
+}
+
 </style>
 </head>
 <body>
 
 <dialog id="lastHandDialog" class="lastHandDialog" aria-labelledby="lastHandDialogTitle"><div class="lastHandDialogInner"><div id="lastHandDialogTitle" class="lastHandDialogTitle">⚠ LAST HAND OF THIS SHOE</div><div id="lastHandDialogResult" class="lastHandDialogResult"></div><div class="lastHandDialogNote">The cut card was reached during this hand. The final result and roads will remain on screen for review. When ready, press <b>START NEW SHOE</b>.</div><button id="lastHandDialogClose" class="lastHandDialogBtn" type="button" autofocus>REVIEW FINAL HAND</button></div></dialog>
 <div class="app">
-  <div class="top"><div class="brand">QROS BACCARAT TRAINER v16 <small>NON-COMMISSION • REAL 8-DECK SHOE • VISIBLE CARDS • TIGER-STYLE NEXT ROAD MAP</small></div><div class="mode"><select id="assist"><option value="casino">Casino Mode</option><option value="learning">Learning Mode</option></select><select id="playMode"><option value="shoe">Simulated 8-deck Shoe</option><option value="manual">Manual Road Practice</option></select><button id="accountBtn">Account</button><button id="newShoe">New Shoe</button><button id="newSession">New Session</button></div></div>
+  <div class="top"><div class="brand">QROS BACCARAT TRAINER v17 <small>NON-COMMISSION • REAL 8-DECK SHOE • VISIBLE CARDS • TIGER-STYLE NEXT ROAD MAP</small></div><div class="mode"><select id="assist"><option value="casino">Casino Mode</option><option value="learning">Learning Mode</option></select><select id="playMode"><option value="shoe">Simulated 8-deck Shoe</option><option value="manual">Manual Road Practice</option></select><button id="accountBtn">Account</button><button id="newShoe">New Shoe</button><button id="newSession">New Session</button></div></div>
   <div class="stats">
     <div class="stat"><span>Demo Bankroll</span><strong id="bankroll">$10,000.00</strong></div>
     <div class="stat"><span>Session P/L</span><strong id="pnl">$0.00</strong></div>
@@ -175,21 +215,71 @@ button,select,input{touch-action:manipulation}
   </div>
 </div>
 
-<div id="accountModal" style="display:none;position:fixed;inset:0;z-index:100000;background:rgba(2,12,20,.78);align-items:center;justify-content:center;padding:18px">
-  <div style="width:min(460px,100%);background:#0b2230;border:1px solid #31556a;border-radius:16px;padding:20px;color:#fff;box-shadow:0 20px 70px #0009">
-    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px">
-      <strong style="font-size:20px">QROS ACCOUNT</strong>
-      <button id="accountClose" style="padding:7px 12px">Close</button>
+
+<div id="accountModal" class="qrosAuthBackdrop" style="display:none">
+  <div class="qrosAuthModal" role="dialog" aria-modal="true" aria-labelledby="qrosAuthTitle">
+    <div class="qrosAuthHead">
+      <div>
+        <div id="qrosAuthTitle" class="qrosAuthTitle">QROS ACCOUNT</div>
+        <div class="qrosAuthSub">Save your baccarat trainer session and restore it on another device.</div>
+      </div>
+      <button id="accountClose" class="qrosAuthClose" aria-label="Close">×</button>
     </div>
-    <div id="accountStatus" style="font-size:13px;color:#9fd5ef;margin-bottom:12px">Local autosave is active.</div>
-    <input id="accountEmail" type="email" autocomplete="email" placeholder="Email" style="width:100%;box-sizing:border-box;margin:5px 0;padding:12px;border-radius:9px;border:1px solid #31556a;background:#071923;color:#fff">
-    <input id="accountPassword" type="password" autocomplete="current-password" placeholder="Password" style="width:100%;box-sizing:border-box;margin:5px 0 12px;padding:12px;border-radius:9px;border:1px solid #31556a;background:#071923;color:#fff">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <button id="accountSignIn">Sign In</button><button id="accountSignUp">Create Account</button>
-      <button id="accountCloudSave">Save to Cloud</button><button id="accountCloudLoad">Restore Cloud</button>
+
+    <div class="qrosAuthTabs">
+      <button id="authTabSignIn" class="qrosAuthTab active">SIGN IN</button>
+      <button id="authTabRegister" class="qrosAuthTab">REGISTER</button>
     </div>
-    <button id="accountSignOut" style="width:100%;margin-top:8px">Sign Out</button>
-    <div style="font-size:11px;color:#83aabd;margin-top:12px;line-height:1.45">Local recovery works immediately. Cloud login becomes active after the Supabase URL and publishable key are configured in this file and the supplied SQL is run once.</div>
+
+    <div id="accountStatus" class="qrosAuthNotice info">
+      <strong>LOCAL SAVE ACTIVE</strong>
+      <span>Your current trainer session is still protected on this device.</span>
+    </div>
+
+    <div class="qrosAuthField">
+      <label for="accountEmail">Email</label>
+      <input id="accountEmail" type="email" autocomplete="email" placeholder="you@example.com">
+    </div>
+
+    <div class="qrosAuthField">
+      <label for="accountPassword">Password</label>
+      <div class="qrosPasswordWrap">
+        <input id="accountPassword" type="password" autocomplete="current-password" placeholder="Password">
+        <button id="toggleAuthPassword" type="button" class="qrosPasswordToggle">SHOW</button>
+      </div>
+      <div id="authPasswordHint" class="qrosAuthHint">Enter the password for your QROS account.</div>
+    </div>
+
+    <div id="registerPanel" style="display:none">
+      <div class="qrosAuthField">
+        <label for="accountPasswordConfirm">Confirm password</label>
+        <input id="accountPasswordConfirm" type="password" autocomplete="new-password" placeholder="Repeat password">
+      </div>
+      <div class="qrosVerifyBox">
+        <strong>EMAIL VERIFICATION REQUIRED</strong>
+        <span>After registration, we will send a verification email. Open it and press the confirmation link before signing in.</span>
+      </div>
+    </div>
+
+    <button id="accountPrimaryAction" class="qrosAuthPrimary">SIGN IN</button>
+
+    <div id="signedOutActions" class="qrosAuthSecondaryActions">
+      <button id="accountResend" style="display:none">RESEND VERIFICATION EMAIL</button>
+    </div>
+
+    <div id="signedInPanel" class="qrosSignedInPanel" style="display:none">
+      <div id="signedInIdentity" class="qrosSignedInIdentity"></div>
+      <div class="qrosCloudActions">
+        <button id="accountCloudSave">SAVE TO CLOUD</button>
+        <button id="accountCloudLoad">RESTORE CLOUD</button>
+      </div>
+      <button id="accountSignOut" class="qrosSignOut">SIGN OUT</button>
+    </div>
+
+    <div class="qrosAuthFooter">Local autosave remains active even while you are signed out.</div>
+
+    <button id="accountSignIn" style="display:none"></button>
+    <button id="accountSignUp" style="display:none"></button>
   </div>
 </div>
 
@@ -232,22 +322,200 @@ async function cloudRestore(){
   if(error||!data?.state)return false;
   S=data.state; save(false); buildChips(); renderAll(); return true;
 }
-function accountStatus(msg){let e=$('accountStatus');if(e)e.textContent=msg}
+
+let qrosAuthMode='signin';
+
+function accountStatus(message,type='info',title=''){
+  const e=$('accountStatus'); if(!e)return;
+  e.className='qrosAuthNotice '+type;
+  e.innerHTML=(title?'<strong>'+title+'</strong>':'')+'<span>'+String(message||'')+'</span>';
+}
+function authInputs(){
+  return {
+    email:$('accountEmail').value.trim(),
+    password:$('accountPassword').value,
+    confirm:$('accountPasswordConfirm')?.value||''
+  };
+}
+function setAuthBusy(busy,label=''){
+  ['accountPrimaryAction','accountResend','accountCloudSave','accountCloudLoad','accountSignOut'].forEach(id=>{const e=$(id);if(e)e.disabled=busy});
+  if(label&&$('accountPrimaryAction'))$('accountPrimaryAction').textContent=label;
+}
+function setAuthMode(mode){
+  qrosAuthMode=mode;
+  const register=mode==='register';
+  $('registerPanel').style.display=register?'block':'none';
+  $('authTabSignIn').classList.toggle('active',!register);
+  $('authTabRegister').classList.toggle('active',register);
+  $('accountPrimaryAction').textContent=register?'CREATE ACCOUNT':'SIGN IN';
+  $('accountPassword').setAttribute('autocomplete',register?'new-password':'current-password');
+  $('authPasswordHint').textContent=register
+    ?'Use at least 6 characters. A verification email will be sent after registration.'
+    :'Enter the password for your QROS account.';
+  if(!qrosUser){
+    accountStatus(
+      register
+        ?'Register with an email address you can access. You must confirm the verification email before signing in.'
+        :'Enter your verified QROS account email and password.',
+      'info',
+      register?'CREATE YOUR QROS ACCOUNT':'SIGN IN TO QROS'
+    );
+  }
+}
+function updateSignedInUI(){
+  const signed=!!qrosUser;
+  $('signedInPanel').style.display=signed?'block':'none';
+  $('signedOutActions').style.display=signed?'none':'grid';
+  $('accountPrimaryAction').style.display=signed?'none':'block';
+  $('authTabSignIn').disabled=signed;
+  $('authTabRegister').disabled=signed;
+  $('accountEmail').disabled=signed;
+  $('accountPassword').disabled=signed;
+  $('accountPasswordConfirm').disabled=signed;
+  if(signed){
+    $('signedInIdentity').textContent='SIGNED IN AS  '+(qrosUser.email||qrosUser.id);
+    accountStatus('Your QROS account is connected. Local autosave remains active and you can sync this session to the cloud.','success','ACCOUNT CONNECTED');
+  }
+}
+function friendlyAuthError(error){
+  const m=(error?.message||String(error||'')).trim();
+  if(/invalid login credentials/i.test(m))return 'Email or password is incorrect, or the email has not been verified yet.';
+  if(/email not confirmed/i.test(m))return 'Your email has not been verified yet. Open the verification email, confirm it, then sign in.';
+  if(/password should be at least/i.test(m))return 'Password is too short. Please use at least 6 characters.';
+  if(/rate limit/i.test(m))return 'Too many requests. Wait a moment before trying again.';
+  return m||'Something went wrong. Please try again.';
+}
 async function initAccount(){
   const c=cloudClient();
-  if(!c){accountStatus('Local autosave active. Cloud account needs Supabase configuration.');return}
-  const {data}=await c.auth.getSession(); qrosUser=data?.session?.user||null;
-  accountStatus(qrosUser?'Signed in: '+qrosUser.email:'Local autosave active. Sign in for cloud sync.');
-  c.auth.onAuthStateChange((_event,session)=>{qrosUser=session?.user||null;accountStatus(qrosUser?'Signed in: '+qrosUser.email:'Signed out. Local autosave remains active.')});
+  if(!c){
+    accountStatus('Cloud account is not configured. Local autosave is still active.','warning','CLOUD NOT CONFIGURED');
+    return;
+  }
+  const {data}=await c.auth.getSession();
+  qrosUser=data?.session?.user||null;
+  updateSignedInUI();
+  if(!qrosUser)setAuthMode('signin');
+  c.auth.onAuthStateChange((event,session)=>{
+    qrosUser=session?.user||null;
+    updateSignedInUI();
+    if(event==='SIGNED_IN'&&qrosUser)accountStatus('Sign-in successful. Your cloud session is ready.','success','SIGNED IN');
+    if(event==='SIGNED_OUT'){
+      qrosUser=null;
+      updateSignedInUI();
+      setAuthMode('signin');
+    }
+  });
+}
+async function doSignIn(){
+  const c=cloudClient(); if(!c)return accountStatus('Cloud is not configured.','error','SIGN IN FAILED');
+  const {email,password}=authInputs();
+  if(!email||!password)return accountStatus('Enter both your email and password.','warning','MISSING DETAILS');
+  setAuthBusy(true,'SIGNING IN…');
+  const {data,error}=await c.auth.signInWithPassword({email,password});
+  if(error){
+    setAuthBusy(false,'SIGN IN');
+    $('accountResend').style.display='block';
+    return accountStatus(friendlyAuthError(error),'error','SIGN IN FAILED');
+  }
+  qrosUser=data?.user||null;
+  updateSignedInUI();
+  accountStatus('Signed in successfully. Checking for your saved cloud session…','success','WELCOME BACK');
+  const ok=await cloudRestore();
+  accountStatus(
+    ok?'Your saved QROS session was restored from the cloud.':'Signed in successfully. No previous cloud session was found, so your current local session has been kept.',
+    'success',
+    ok?'SESSION RESTORED':'SIGNED IN'
+  );
+  if(!ok)await cloudSaveNow();
+  setAuthBusy(false,'SIGN IN');
+}
+async function doRegister(){
+  const c=cloudClient(); if(!c)return accountStatus('Cloud is not configured.','error','REGISTRATION FAILED');
+  const {email,password,confirm}=authInputs();
+  if(!email||!password||!confirm)return accountStatus('Complete the email, password, and confirm-password fields.','warning','MISSING DETAILS');
+  if(password.length<6)return accountStatus('Please use a password with at least 6 characters.','warning','PASSWORD TOO SHORT');
+  if(password!==confirm)return accountStatus('The two passwords do not match.','error','PASSWORDS DO NOT MATCH');
+
+  setAuthBusy(true,'CREATING ACCOUNT…');
+  const {data,error}=await c.auth.signUp({
+    email,
+    password,
+    options:{emailRedirectTo:'https://9uacamole.github.io/qros-baccarat-trainer/'}
+  });
+  setAuthBusy(false,'CREATE ACCOUNT');
+
+  if(error)return accountStatus(friendlyAuthError(error),'error','REGISTRATION FAILED');
+
+  $('accountResend').style.display='block';
+  $('accountResend').textContent='RESEND VERIFICATION EMAIL';
+
+  if(data?.session){
+    qrosUser=data.user;
+    updateSignedInUI();
+    return accountStatus('Your account was created and is already signed in.','success','ACCOUNT CREATED');
+  }
+
+  accountStatus(
+    'A verification email has been sent to '+email+'. Open that email and press the confirmation link. After verification, return here and use SIGN IN.',
+    'success',
+    'CHECK YOUR EMAIL'
+  );
+}
+async function resendVerification(){
+  const c=cloudClient(); if(!c)return;
+  const email=$('accountEmail').value.trim();
+  if(!email)return accountStatus('Enter the email address you registered with first.','warning','EMAIL REQUIRED');
+
+  setAuthBusy(true);
+  const {error}=await c.auth.resend({
+    type:'signup',
+    email,
+    options:{emailRedirectTo:'https://9uacamole.github.io/qros-baccarat-trainer/'}
+  });
+  setAuthBusy(false,qrosAuthMode==='register'?'CREATE ACCOUNT':'SIGN IN');
+
+  if(error)return accountStatus(friendlyAuthError(error),'error','EMAIL NOT SENT');
+
+  accountStatus(
+    'A new verification email was requested for '+email+'. Please check Inbox and Spam/Junk.',
+    'success',
+    'VERIFICATION EMAIL SENT'
+  );
 }
 function initAccountUI(){
-  $('accountBtn').onclick=()=>{$('accountModal').style.display='flex'};
+  $('accountBtn').onclick=()=>{$('accountModal').style.display='flex';updateSignedInUI()};
   $('accountClose').onclick=()=>{$('accountModal').style.display='none'};
-  $('accountSignIn').onclick=async()=>{const c=cloudClient();if(!c)return accountStatus('Cloud is not configured yet. See SUPABASE_SETUP.txt.');const {error}=await c.auth.signInWithPassword({email:$('accountEmail').value.trim(),password:$('accountPassword').value});if(error)return accountStatus(error.message);qrosUser=(await c.auth.getUser()).data.user;accountStatus('Signed in. Restoring your cloud session…');const ok=await cloudRestore();accountStatus(ok?'Cloud session restored.':'Signed in. No cloud session found yet; current local session preserved.');if(!ok)await cloudSaveNow()};
-  $('accountSignUp').onclick=async()=>{const c=cloudClient();if(!c)return accountStatus('Cloud is not configured yet. See SUPABASE_SETUP.txt.');const {error}=await c.auth.signUp({email:$('accountEmail').value.trim(),password:$('accountPassword').value});accountStatus(error?error.message:'Account created. Check your email if confirmation is enabled.')};
-  $('accountCloudSave').onclick=async()=>accountStatus(await cloudSaveNow()?'Saved to cloud.':'Sign in first, or configure Supabase.');
-  $('accountCloudLoad').onclick=async()=>accountStatus(await cloudRestore()?'Cloud session restored.':'No cloud session found, or sign in first.');
-  $('accountSignOut').onclick=async()=>{const c=cloudClient();if(c)await c.auth.signOut({scope:'local'});qrosUser=null;accountStatus('Signed out. Local autosave remains active.')};
+  $('accountModal').addEventListener('click',e=>{if(e.target===$('accountModal'))$('accountModal').style.display='none'});
+  $('authTabSignIn').onclick=()=>setAuthMode('signin');
+  $('authTabRegister').onclick=()=>setAuthMode('register');
+  $('accountPrimaryAction').onclick=()=>qrosAuthMode==='register'?doRegister():doSignIn();
+  $('accountSignIn').onclick=doSignIn;
+  $('accountSignUp').onclick=doRegister;
+  $('accountResend').onclick=resendVerification;
+  $('toggleAuthPassword').onclick=()=>{
+    const p=$('accountPassword');
+    const show=p.type==='password';
+    p.type=show?'text':'password';
+    $('toggleAuthPassword').textContent=show?'HIDE':'SHOW';
+  };
+  $('accountPassword').addEventListener('keydown',e=>{if(e.key==='Enter'&&qrosAuthMode==='signin')doSignIn()});
+  $('accountPasswordConfirm').addEventListener('keydown',e=>{if(e.key==='Enter'&&qrosAuthMode==='register')doRegister()});
+  $('accountCloudSave').onclick=async()=>{
+    const ok=await cloudSaveNow();
+    accountStatus(ok?'Your current QROS trainer session has been saved to your account.':'Cloud save failed. Make sure you are signed in.',ok?'success':'error',ok?'CLOUD SAVE COMPLETE':'CLOUD SAVE FAILED');
+  };
+  $('accountCloudLoad').onclick=async()=>{
+    const ok=await cloudRestore();
+    accountStatus(ok?'Your cloud session has been restored successfully.':'No saved cloud session was found for this account.',ok?'success':'info',ok?'CLOUD SESSION RESTORED':'NO CLOUD SAVE');
+  };
+  $('accountSignOut').onclick=async()=>{
+    const c=cloudClient();
+    if(c)await c.auth.signOut({scope:'local'});
+    qrosUser=null;
+    updateSignedInUI();
+    setAuthMode('signin');
+    accountStatus('You are signed out. Your local trainer session remains saved on this device.','info','SIGNED OUT');
+  };
 }
 
 const APPROVED=[
