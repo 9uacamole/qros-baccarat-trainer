@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>QROS Baccarat Trainer v15 — Mobile Responsive</title>
@@ -130,7 +131,7 @@ button,select,input{touch-action:manipulation}
 
 <dialog id="lastHandDialog" class="lastHandDialog" aria-labelledby="lastHandDialogTitle"><div class="lastHandDialogInner"><div id="lastHandDialogTitle" class="lastHandDialogTitle">⚠ LAST HAND OF THIS SHOE</div><div id="lastHandDialogResult" class="lastHandDialogResult"></div><div class="lastHandDialogNote">The cut card was reached during this hand. The final result and roads will remain on screen for review. When ready, press <b>START NEW SHOE</b>.</div><button id="lastHandDialogClose" class="lastHandDialogBtn" type="button" autofocus>REVIEW FINAL HAND</button></div></dialog>
 <div class="app">
-  <div class="top"><div class="brand">QROS BACCARAT TRAINER v4 <small>NON-COMMISSION • REAL 8-DECK SHOE • VISIBLE CARDS • TIGER-STYLE NEXT ROAD MAP</small></div><div class="mode"><select id="assist"><option value="casino">Casino Mode</option><option value="learning">Learning Mode</option></select><select id="playMode"><option value="shoe">Simulated 8-deck Shoe</option><option value="manual">Manual Road Practice</option></select><button id="newShoe">New Shoe</button><button id="newSession">New Session</button></div></div>
+  <div class="top"><div class="brand">QROS BACCARAT TRAINER v16 <small>NON-COMMISSION • REAL 8-DECK SHOE • VISIBLE CARDS • TIGER-STYLE NEXT ROAD MAP</small></div><div class="mode"><select id="assist"><option value="casino">Casino Mode</option><option value="learning">Learning Mode</option></select><select id="playMode"><option value="shoe">Simulated 8-deck Shoe</option><option value="manual">Manual Road Practice</option></select><button id="accountBtn">Account</button><button id="newShoe">New Shoe</button><button id="newSession">New Session</button></div></div>
   <div class="stats">
     <div class="stat"><span>Demo Bankroll</span><strong id="bankroll">$10,000.00</strong></div>
     <div class="stat"><span>Session P/L</span><strong id="pnl">$0.00</strong></div>
@@ -173,7 +174,82 @@ button,select,input{touch-action:manipulation}
     </aside>
   </div>
 </div>
+
+<div id="accountModal" style="display:none;position:fixed;inset:0;z-index:100000;background:rgba(2,12,20,.78);align-items:center;justify-content:center;padding:18px">
+  <div style="width:min(460px,100%);background:#0b2230;border:1px solid #31556a;border-radius:16px;padding:20px;color:#fff;box-shadow:0 20px 70px #0009">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px">
+      <strong style="font-size:20px">QROS ACCOUNT</strong>
+      <button id="accountClose" style="padding:7px 12px">Close</button>
+    </div>
+    <div id="accountStatus" style="font-size:13px;color:#9fd5ef;margin-bottom:12px">Local autosave is active.</div>
+    <input id="accountEmail" type="email" autocomplete="email" placeholder="Email" style="width:100%;box-sizing:border-box;margin:5px 0;padding:12px;border-radius:9px;border:1px solid #31556a;background:#071923;color:#fff">
+    <input id="accountPassword" type="password" autocomplete="current-password" placeholder="Password" style="width:100%;box-sizing:border-box;margin:5px 0 12px;padding:12px;border-radius:9px;border:1px solid #31556a;background:#071923;color:#fff">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button id="accountSignIn">Sign In</button><button id="accountSignUp">Create Account</button>
+      <button id="accountCloudSave">Save to Cloud</button><button id="accountCloudLoad">Restore Cloud</button>
+    </div>
+    <button id="accountSignOut" style="width:100%;margin-top:8px">Sign Out</button>
+    <div style="font-size:11px;color:#83aabd;margin-top:12px;line-height:1.45">Local recovery works immediately. Cloud login becomes active after the Supabase URL and publishable key are configured in this file and the supplied SQL is run once.</div>
+  </div>
+</div>
+
 <script>
+
+const QROS_STORAGE_KEY='qros-baccarat-trainer-v8-noncommission';
+const QROS_SUPABASE_URL='https://sgxeopunnkirhjyanexx.supabase.co';
+const QROS_SUPABASE_PUBLISHABLE_KEY='sb_publishable_FFET8QbN5Lp0YOWaByO38A_8t-VKprT';
+let qrosCloud=null,qrosUser=null,qrosCloudTimer=null;
+function cloudConfigured(){return QROS_SUPABASE_URL.startsWith('https://')&&!QROS_SUPABASE_PUBLISHABLE_KEY.startsWith('PASTE_')}
+function cloudClient(){
+  if(qrosCloud)return qrosCloud;
+  if(!cloudConfigured()||!window.supabase)return null;
+  qrosCloud=window.supabase.createClient(QROS_SUPABASE_URL,QROS_SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  return qrosCloud;
+}
+function snapshotState(){return {...S,shoe:Array.isArray(S.shoe)?S.shoe.slice(0,416):[]}}
+function loadLocalState(){
+  try{
+    const raw=localStorage.getItem(QROS_STORAGE_KEY);
+    if(!raw)return false;
+    const saved=JSON.parse(raw);
+    if(!saved||typeof saved!=='object'||!Array.isArray(saved.results)||!Array.isArray(saved.shoe))return false;
+    S=saved;
+    if(!S.bets)S.bets={BANKER:0,PLAYER:0,TIE:0};
+    if(!Array.isArray(S.history))S.history=[];
+    return true;
+  }catch(e){console.warn('QROS local restore failed',e);return false}
+}
+async function cloudSaveNow(){
+  const c=cloudClient(); if(!c||!qrosUser)return false;
+  const {error}=await c.from('trainer_state').upsert({user_id:qrosUser.id,state:snapshotState(),updated_at:new Date().toISOString()},{onConflict:'user_id'});
+  if(error){console.warn('QROS cloud save failed',error);return false}
+  return true;
+}
+function queueCloudSave(){clearTimeout(qrosCloudTimer);qrosCloudTimer=setTimeout(()=>cloudSaveNow(),500)}
+async function cloudRestore(){
+  const c=cloudClient(); if(!c||!qrosUser)return false;
+  const {data,error}=await c.from('trainer_state').select('state').eq('user_id',qrosUser.id).maybeSingle();
+  if(error||!data?.state)return false;
+  S=data.state; save(false); buildChips(); renderAll(); return true;
+}
+function accountStatus(msg){let e=$('accountStatus');if(e)e.textContent=msg}
+async function initAccount(){
+  const c=cloudClient();
+  if(!c){accountStatus('Local autosave active. Cloud account needs Supabase configuration.');return}
+  const {data}=await c.auth.getSession(); qrosUser=data?.session?.user||null;
+  accountStatus(qrosUser?'Signed in: '+qrosUser.email:'Local autosave active. Sign in for cloud sync.');
+  c.auth.onAuthStateChange((_event,session)=>{qrosUser=session?.user||null;accountStatus(qrosUser?'Signed in: '+qrosUser.email:'Signed out. Local autosave remains active.')});
+}
+function initAccountUI(){
+  $('accountBtn').onclick=()=>{$('accountModal').style.display='flex'};
+  $('accountClose').onclick=()=>{$('accountModal').style.display='none'};
+  $('accountSignIn').onclick=async()=>{const c=cloudClient();if(!c)return accountStatus('Cloud is not configured yet. See SUPABASE_SETUP.txt.');const {error}=await c.auth.signInWithPassword({email:$('accountEmail').value.trim(),password:$('accountPassword').value});if(error)return accountStatus(error.message);qrosUser=(await c.auth.getUser()).data.user;accountStatus('Signed in. Restoring your cloud session…');const ok=await cloudRestore();accountStatus(ok?'Cloud session restored.':'Signed in. No cloud session found yet; current local session preserved.');if(!ok)await cloudSaveNow()};
+  $('accountSignUp').onclick=async()=>{const c=cloudClient();if(!c)return accountStatus('Cloud is not configured yet. See SUPABASE_SETUP.txt.');const {error}=await c.auth.signUp({email:$('accountEmail').value.trim(),password:$('accountPassword').value});accountStatus(error?error.message:'Account created. Check your email if confirmation is enabled.')};
+  $('accountCloudSave').onclick=async()=>accountStatus(await cloudSaveNow()?'Saved to cloud.':'Sign in first, or configure Supabase.');
+  $('accountCloudLoad').onclick=async()=>accountStatus(await cloudRestore()?'Cloud session restored.':'No cloud session found, or sign in first.');
+  $('accountSignOut').onclick=async()=>{const c=cloudClient();if(c)await c.auth.signOut({scope:'local'});qrosUser=null;accountStatus('Signed out. Local autosave remains active.')};
+}
+
 const APPROVED=[
  {pattern:'2X2',road:'BIG_EYE',len:5,label:'2X2 + Big Eye Boy · L5',rank:1},
  {pattern:'DRAGON',road:'BIG_EYE',len:5,label:'DRAGON + Big Eye Boy · L5',rank:2},
@@ -274,8 +350,8 @@ function resetPracticeBetPosition(){let card=$('practiceBetCard');card.classList
 function isPhoneLayout(){return window.matchMedia('(max-width:700px)').matches}
 function restorePracticeBetPosition(){let card=$('practiceBetCard');if(isPhoneLayout()){card.classList.remove('floatingBet','dragging');card.style.left='';card.style.right='';card.style.top='';card.style.bottom='';card.style.width='';return}try{let raw=localStorage.getItem('qros-practice-bet-position-v8');if(!raw)return;let pos=JSON.parse(raw);if(!Number.isFinite(pos.left)||!Number.isFinite(pos.top))return;card.classList.add('floatingBet');let w=Math.min(pos.width||card.getBoundingClientRect().width,window.innerWidth-24);card.style.width=w+'px';card.style.left=clamp(pos.left,12,Math.max(12,window.innerWidth-w-12))+'px';card.style.top=clamp(pos.top,12,Math.max(12,window.innerHeight-80))+'px'}catch{}}
 function initPracticeBetDrag(){let card=$('practiceBetCard'),handle=$('practiceBetHandle');if(!card||!handle)return;let drag=null;handle.addEventListener('pointerdown',e=>{if(isPhoneLayout())return;if(e.button!==undefined&&e.button!==0)return;let r=card.getBoundingClientRect();if(!card.classList.contains('floatingBet')){card.classList.add('floatingBet');card.style.width=Math.min(r.width,window.innerWidth-24)+'px';card.style.left=r.left+'px';card.style.top=r.top+'px'}r=card.getBoundingClientRect();drag={dx:e.clientX-r.left,dy:e.clientY-r.top,id:e.pointerId};card.classList.add('dragging');handle.setPointerCapture?.(e.pointerId);e.preventDefault()});handle.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;let r=card.getBoundingClientRect(),left=clamp(e.clientX-drag.dx,8,Math.max(8,window.innerWidth-r.width-8)),top=clamp(e.clientY-drag.dy,8,Math.max(8,window.innerHeight-r.height-8));card.style.left=left+'px';card.style.top=top+'px'});let end=e=>{if(!drag||drag.id!==e.pointerId)return;drag=null;card.classList.remove('dragging');let r=card.getBoundingClientRect();try{localStorage.setItem('qros-practice-bet-position-v8',JSON.stringify({left:r.left,top:r.top,width:r.width}))}catch{}};handle.addEventListener('pointerup',end);handle.addEventListener('pointercancel',end);handle.addEventListener('dblclick',()=>resetPracticeBetPosition());window.addEventListener('resize',()=>{if(!card.classList.contains('floatingBet'))return;let r=card.getBoundingClientRect();card.style.left=clamp(r.left,8,Math.max(8,window.innerWidth-r.width-8))+'px';card.style.top=clamp(r.top,8,Math.max(8,window.innerHeight-r.height-8))+'px'})}
-function save(){try{localStorage.setItem('qros-baccarat-trainer-v8-noncommission',JSON.stringify({...S,shoe:S.shoe.slice(0,416)}))}catch{}}
-function init(){window.addEventListener('resize',()=>{restorePracticeBetPosition();renderAll()});startShoe(true);buildChips();restorePracticeBetPosition();initPracticeBetDrag();document.querySelectorAll('.bet').forEach(b=>b.onclick=()=>addBet(b.dataset.side));$('clearBet').onclick=clearBet;$('skip').onclick=()=>{clearBet();S.pendingSkip=true;$('coach').textContent='SKIP selected. Deal the hand to score your decision.'};$('deal').onclick=deal;$('newShoe').onclick=()=>{if(confirm('Start a fresh shuffled shoe? Roads will reset, but bankroll/P&L will continue.')){clearBet();startShoe(true);save();$('coach').textContent='Fresh 8-deck shoe started. Roads reset; bankroll preserved.';renderAll()}};$('newSession').onclick=()=>{if(confirm('Start a fresh demo session?'))reset()};$('baseUnit').onchange=()=>{S.unit=Math.max(1,+$('baseUnit').value||100);buildChips();renderAll()};$('playMode').onchange=()=>{$('manualBox').classList.toggle('show',$('playMode').value==='manual')};$('assist').onchange=()=>{renderSignal();renderNextRoadMap();renderPredictions(false)};document.querySelectorAll('[data-result]').forEach(b=>b.onclick=()=>settle(b.dataset.result,null));renderAll()}
+function save(syncCloud=true){try{localStorage.setItem(QROS_STORAGE_KEY,JSON.stringify(snapshotState()))}catch{}if(syncCloud&&qrosUser)queueCloudSave()}
+function init(){window.addEventListener('resize',()=>{restorePracticeBetPosition();renderAll();initAccountUI();initAccount()});startShoe(true);buildChips();restorePracticeBetPosition();initPracticeBetDrag();document.querySelectorAll('.bet').forEach(b=>b.onclick=()=>addBet(b.dataset.side));$('clearBet').onclick=clearBet;$('skip').onclick=()=>{clearBet();S.pendingSkip=true;$('coach').textContent='SKIP selected. Deal the hand to score your decision.'};$('deal').onclick=deal;$('newShoe').onclick=()=>{if(confirm('Start a fresh shuffled shoe? Roads will reset, but bankroll/P&L will continue.')){clearBet();startShoe(true);save();$('coach').textContent='Fresh 8-deck shoe started. Roads reset; bankroll preserved.';renderAll()}};$('newSession').onclick=()=>{if(confirm('Start a fresh demo session?'))reset()};$('baseUnit').onchange=()=>{S.unit=Math.max(1,+$('baseUnit').value||100);buildChips();renderAll()};$('playMode').onchange=()=>{$('manualBox').classList.toggle('show',$('playMode').value==='manual')};$('assist').onchange=()=>{renderSignal();renderNextRoadMap();renderPredictions(false)};document.querySelectorAll('[data-result]').forEach(b=>b.onclick=()=>settle(b.dataset.result,null));renderAll()}
 init();
 
 $('lastHandDialogClose').onclick=()=>{let d=$('lastHandDialog');if(typeof d.close==='function')d.close();else d.removeAttribute('open')};
